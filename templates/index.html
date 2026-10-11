@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>Find an hour to give.</h1>
+  <p class="lede">
+    {% if totals['hours'] %}Neighbors have given <strong>{{ '%g'|format(totals['hours']) }} hours</strong> through this site so far.{% else %}Browse what's coming up, sign up in one click, and keep track of every hour you give.{% endif %}
+  </p>
+  <form method="get" class="search" role="search">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search by title, place, or topic" aria-label="Search events">
+    {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}
+    <button class="btn" type="submit">Search</button>
+  </form>
+  <div class="pills" aria-label="Filter by category">
+    <a class="pill {{ 'on' if not category }}" href="{{ url_for('index', q=q) }}">All</a>
+    {% for c in categories %}
+      <a class="pill {{ 'on' if category == c }}" href="{{ url_for('index', q=q, category=c) }}">{{ c }}</a>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="events">
+  {% for e in events %}
+    {% set d = parse(e['date']) %}
+    {% set left = e['spots'] - e['taken'] %}
+    <article class="event">
+      <time class="date" datetime="{{ e['date'] }}">
+        <span class="day">{{ d.day }}</span>
+        <span class="mon">{{ d.strftime('%b') }}</span>
+      </time>
+      <div class="body">
+        <h2>{{ e['title'] }}</h2>
+        <p>{{ e['description'] }}</p>
+        <p class="meta">{{ e['category'] }} &middot; {{ e['location'] }} &middot; {{ '%g'|format(e['hours']) }} hours</p>
+        <div class="meter" role="img" aria-label="{{ e['taken'] }} of {{ e['spots'] }} spots taken">
+          <span style="width: {{ (e['taken'] / e['spots'] * 100)|round|int }}%"></span>
+        </div>
+        <p class="spots">{% if left > 0 %}{{ left }} of {{ e['spots'] }} spots left{% else %}Full{% endif %}</p>
+      </div>
+      <div class="action">
+        {% if e['mine'] %}
+          <form method="post" action="{{ url_for('cancel', event_id=e['id']) }}">
+            <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+            <button class="btn ghost" type="submit">Cancel sign-up</button>
+          </form>
+        {% elif left > 0 %}
+          <form method="post" action="{{ url_for('signup', event_id=e['id']) }}">
+            <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+            <button class="btn" type="submit">Sign up</button>
+          </form>
+        {% endif %}
+      </div>
+    </article>
+  {% else %}
+    <p class="empty">No upcoming events match that search. Clear the filters or check back soon.</p>
+  {% endfor %}
+</section>
+{% endblock %}

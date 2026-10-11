@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Create account - Many Hands{% endblock %}
+{% block content %}
+<section class="panel narrow">
+  <h1>Create your account</h1>
+  <form method="post">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <label>Your name <input type="text" name="name" required autocomplete="name"></label>
+    <label>Email <input type="email" name="email" required autocomplete="email"></label>
+    <label>Password <input type="password" name="password" minlength="8" required autocomplete="new-password"></label>
+    <p class="hint">Use at least 8 characters.</p>
+    <button class="btn" type="submit">Create account</button>
+  </form>
+  <p class="hint">Already have an account? <a href="{{ url_for('login') }}">Log in</a>.</p>
+</section>
+{% endblock %}

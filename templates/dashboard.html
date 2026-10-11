@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}My hours - Many Hands{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>{{ g.user['name'] }}, you've given</h1>
+  <p class="big">{{ '%g'|format(total) }} <span>hours</span></p>
+  <canvas id="chart" height="110" aria-label="Volunteer hours per month for the last six months" role="img"></canvas>
+</section>
+
+<div class="two">
+  <section class="panel">
+    <h2>Upcoming events</h2>
+    {% for e in upcoming %}
+      <div class="row">
+        <div>
+          <strong>{{ e['title'] }}</strong><br>
+          <span class="meta">{{ parse(e['date']).strftime('%a %d %b') }} &middot; {{ e['location'] }}</span>
+        </div>
+        <form method="post" action="{{ url_for('cancel', event_id=e['id']) }}">
+          <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+          <button class="link" type="submit">Cancel</button>
+        </form>
+      </div>
+    {% else %}
+      <p class="empty">You haven't signed up for anything yet. <a href="{{ url_for('index') }}">Find an event</a>.</p>
+    {% endfor %}
+  </section>
+
+  <section class="panel">
+    <h2>Log hours you gave elsewhere</h2>
+    <form method="post" action="{{ url_for('log_hours') }}">
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+      <label>Organization <input type="text" name="organization" required></label>
+      <div class="grid2">
+        <label>Date <input type="date" name="date" required></label>
+        <label>Hours <input type="number" name="hours" min="0.5" max="24" step="0.5" required></label>
+      </div>
+      <button class="btn" type="submit">Log hours</button>
+    </form>
+    {% for h in logged[:5] %}
+      <div class="row"><span>{{ h['organization'] }} <span class="meta">{{ h['date'] }}</span></span><strong>{{ '%g'|format(h['hours']) }} h</strong></div>
+    {% endfor %}
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+  fetch("{{ url_for('api_hours') }}")
+    .then(r => r.json())
+    .then(d => new Chart(document.getElementById("chart"), {
+      type: "bar",
+      data: { labels: d.labels, datasets: [{ label: "Hours", data: d.hours, backgroundColor: "#1B7F79", borderRadius: 4 }] },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: "Hours" } } } }
+    }));
+</script>
+{% endblock %}

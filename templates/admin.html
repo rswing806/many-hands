@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Manage events - Many Hands{% endblock %}
+{% block content %}
+<div class="two">
+  <section class="panel">
+    <h1>Post an event</h1>
+    <form method="post">
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+      <label>Title <input type="text" name="title" required></label>
+      <label>Description <textarea name="description" rows="3" required></textarea></label>
+      <div class="grid2">
+        <label>Category
+          <select name="category">{% for c in categories %}<option>{{ c }}</option>{% endfor %}</select>
+        </label>
+        <label>Location <input type="text" name="location" required></label>
+      </div>
+      <div class="grid3">
+        <label>Date <input type="date" name="date" min="{{ today }}" required></label>
+        <label>Hours <input type="number" name="hours" min="0.5" max="24" step="0.5" value="2" required></label>
+        <label>Spots <input type="number" name="spots" min="1" max="500" value="10" required></label>
+      </div>
+      <button class="btn" type="submit">Publish event</button>
+    </form>
+  </section>
+
+  <section class="panel">
+    <h2>All events</h2>
+    {% for e in events %}
+      <div class="row">
+        <div>
+          <strong>{{ e['title'] }}</strong><br>
+          <span class="meta">{{ e['date'] }} &middot; {{ e['taken'] }}/{{ e['spots'] }} signed up</span>
+        </div>
+        <form method="post" action="{{ url_for('delete_event', event_id=e['id']) }}" onsubmit="return confirm('Delete this event and its sign-ups?')">
+          <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+          <button class="link danger" type="submit">Delete</button>
+        </form>
+      </div>
+    {% endfor %}
+  </section>
+</div>
+{% endblock %}
