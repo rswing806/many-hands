@@ -65,8 +65,19 @@ Then open http://127.0.0.1:5000 in your browser. Sample events are added the fir
 
 ## What I learned
 
-<!-- Write this part yourself, in your own words. Name one or two real problems you ran into
-     and how you solved them. Admissions readers care about this section most. -->
+- Backend development: building web application logic with Python and Flask.
+
+- Database management: storing and retrieving users, events, registrations and volunteer hours with SQLite.
+
+- Authentication: implementing user accounts and password hashing.
+
+- Web security: understanding CSRF protection and why web applications need safeguards against attacks.
+
+- Frontend development: creating responsive pages with HTML, CSS and JavaScript.
+
+- Data visualization: displaying monthly volunteering statistics using Chart.js.
+
+- Access control: distinguishing administrator permissions from regular user permissions.
 
 ## Ideas for next steps
 
